@@ -14,12 +14,6 @@ source `config-menus.nu`
 
 $env.EDITOR = `micro`
 
-def ups [...name: string] {
-  for $n in $name {
-    winget upgrade $n
-  }
-}
-
 def get-subdirs [$p: string] {
   return (ls $p | where type == dir | get name | sort --ignore-case --natural | path basename)
 }
