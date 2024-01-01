@@ -33,7 +33,7 @@ def --env cc [$basepath?: string] {
   }
 }
 
-def --env xx [$basepath?: string] {
+def select-parent [$basepath?: string] {
   let $base = ($basepath | default $env.PWD)
   
   mut $paths = []
@@ -47,9 +47,19 @@ def --env xx [$basepath?: string] {
     }
     $i = $iBase
   }
-  let $p = ($paths | input list --fuzzy $'Navigate to parent directory…')
+  ($paths | input list --fuzzy $'Navigate to parent directory…')
+}
+def --env xx [$basepath?: string] {
+  let $p = select-parent $basepath
   if $p != null {
     echo $'Changing to ($p)…'
     cd $p
+  }
+}
+
+def nav [$action?: string] {
+  match $action {
+    up => xx
+    _ => cc
   }
 }
