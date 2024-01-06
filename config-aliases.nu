@@ -1,3 +1,4 @@
+def e [...args] { ^($env.EDITOR) $args }
 #alias edit = `C:\Program Files\Notepad++\Notepad++.exe`
 #alias edit = `C:\Program Files\Vim\vim90\vim.exe`
 alias vim = `C:\Program Files\Vim\vim90\vim.exe`
@@ -17,6 +18,10 @@ alias dlm = yt-dlp -f 251
 alias ff = ffmpeg -hide_banner
 alias fp = ffprobe -hide_banner
 #old-alias ffweb = ff -i $1 -map_chapters -1 -map 0:v -map 0:a -c:v libsvtav1 -pix_fmt yuv420p10le -c:a libopus $2
+
+alias gi = `gitui`
+
+alias db = dotnet build --nologo
 
 # External forwards
 #def vim [...args] { ^`C:\Program Files\Vim\vim90\vim.exe` $args }
