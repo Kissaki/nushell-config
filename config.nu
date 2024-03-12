@@ -9,6 +9,7 @@ $env.config.rm.always_trash = true
 
 source `config-integrations.nu`
 source `config-aliases.nu`
+source `config-commands.nu`
 
 source `config-menus.nu`
 
