@@ -1,6 +1,9 @@
 # Extends env file (`$nu.env-path` `C:\Users\USER\AppData\Roaming\nushell\env.nu`)
 # Sourced there through `source `~\.config\nushell\env.nu``
 
+# Windows Installation path fixup https://github.com/nushell/nushell/issues/13065
+$env.NU_PLUGIN_DIRS = ($env.NU_PLUGIN_DIRS | prepend ($nu.current-exe | path parse | get parent))
+
 const cfgpath = '~\.config\nushell'
 const nuscriptspath = $'($cfgpath)\nu_scripts'
 const nuscriptspath2 = $'($cfgpath)\nu_scripts\modules'
