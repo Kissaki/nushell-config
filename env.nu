@@ -1,7 +1,7 @@
 # Extends env file (`$nu.env-path` `C:\Users\USER\AppData\Roaming\nushell\env.nu`)
 # Sourced there through `source '~\nushell\env.nu'`
 
-const cfgpath = '~\nushell'
+const cfgpath = '~\.config\nushell'
 const nuscriptspath = $'($cfgpath)\nu_scripts'
 
 $env.NU_LIB_DIRS = [...$env.NU_LIB_DIRS $nuscriptspath ]

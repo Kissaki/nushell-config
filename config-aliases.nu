@@ -27,3 +27,6 @@ alias f = filemeta
 
 # External forwards
 #def vim [...args] { ^`C:\Program Files\Vim\vim90\vim.exe` $args }
+
+#alias code = $'($env.USERPROFILE)\AppData\Local\Programs\Microsoft VS Code\Code.exe'
+#def code [...args] { ^$'($env.USERPROFILE)\AppData\Local\Programs\Microsoft VS Code\Code.exe` ($args | str join " ") }
