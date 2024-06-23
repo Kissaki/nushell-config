@@ -7,6 +7,7 @@ $env.config.rm.always_trash = true
 #$env.config.shell_integration = true
 #$env.config.highlight_resolved_externals = true
 
+source `config-nusc-completions.nu`
 source `config-integrations.nu`
 source `config-aliases.nu`
 source `config-commands.nu`
