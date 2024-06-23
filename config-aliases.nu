@@ -23,5 +23,7 @@ alias gi = `gitui`
 
 alias db = dotnet build --nologo
 
+alias f = filemeta
+
 # External forwards
 #def vim [...args] { ^`C:\Program Files\Vim\vim90\vim.exe` $args }
