@@ -14,7 +14,7 @@ source `config-commands.nu`
 
 source `config-menus.nu`
 
-$env.EDITOR = `micro`
+$env.EDITOR = 'micro'
 
 source nav.nu
 
