@@ -21,6 +21,7 @@ def e [...args] { ^($env.EDITOR) ...$args }
 alias c = task spawn { code . }
 alias p = pueue
 alias t = task
+# ISSUE: Command 'task' not found
 def s [...args] { task spawn { $args } }
 alias gi = `gitui`
 alias db = dotnet build --nologo
