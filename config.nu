@@ -22,7 +22,7 @@ source nav.nu
 #use job.nu
 #use up.nu
 use $'($nu.cache-dir)/starship-init.nu'
-use $'($nu.cache-dir)/starship-completions.nu' *
+#use $'($nu.cache-dir)/starship-completions.nu' *
 #use $'($nu.cache-dir)/pueue-completions.nu' *
 use 'nu_scripts/modules/background_task/task.nu'
 
