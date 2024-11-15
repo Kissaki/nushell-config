@@ -1,5 +1,5 @@
 # Extends config file (`$nu.config-path` `C:\Users\USER\AppData\Roaming\nushell\config.nu`)
-# Sourced there through `source `~\nushell\config.nu``
+# Sourced there through `source `~\.config\nushell\config.nu``
 
 $env.config.show_banner = false
 $env.config.rm.always_trash = true
