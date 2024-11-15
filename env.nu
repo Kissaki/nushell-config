@@ -19,7 +19,7 @@ def call-if-old [filepath: path, fn: closure] {
 
 mkdir $nu.cache-dir
 call-if-old $'($nu.cache-dir)/starship-init.nu' {|filepath| starship init nu | save -f $filepath }
-call-if-old $'($nu.cache-dir)/pueue-completions.nu' {|filepath| pueue completions nushell | save -f $filepath }
+#call-if-old $'($nu.cache-dir)/pueue-completions.nu' {|filepath| pueue completions nushell | save -f $filepath }
 #call-if-old $'($nu.cache-dir)/starship-completions.nu' {|filepath| starship completions nushell | save -f $filepath }
 
 #zoxide init nushell | save -f ~/.zoxide.nu
