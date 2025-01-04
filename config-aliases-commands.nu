@@ -1,4 +1,10 @@
 alias ll = ls -al
+# latest GitHub release - repo form: account/repo
+def "gh latest" [repo: string] { http head $'https://github.com/($repo)/releases/latest/' --redirect-mode manual | where name == location | get value.0 | path split | last }
+def "ss status" [] { sudo sc query SunshineService }
+def "ss start" [] { sudo sc start SunshineService }
+def "ss stop" [] { sudo sc stop SunshineService }
+alias ss = ss status
 
 # Shorts
 ## Native
