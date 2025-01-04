@@ -16,8 +16,7 @@ $env.config.hooks.display_output = 'table'
 $env.config.datetime_format.normal = '%F %T %z'
 
 source `config-nusc-completions.nu`
-source `config-aliases.nu`
-source `config-commands.nu`
+source `config-aliases-commands.nu`
 
 source `config-menus.nu`
 
