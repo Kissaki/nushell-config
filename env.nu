@@ -5,10 +5,8 @@
 $env.NU_PLUGIN_DIRS = ($env.NU_PLUGIN_DIRS | prepend ($nu.current-exe | path parse | get parent))
 
 const cfgpath = '~\.config\nushell'
-const nuscriptspath = $'($cfgpath)\nu_scripts'
 const nuscriptspath2 = $'($cfgpath)\nu_scripts\modules'
 
-$env.NU_LIB_DIRS = [...$env.NU_LIB_DIRS $nuscriptspath ]
 $env.NU_LIB_DIRS = [...$env.NU_LIB_DIRS $nuscriptspath2 ]
 
 def is-old [filepath: path] {
