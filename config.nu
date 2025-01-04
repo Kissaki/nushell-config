@@ -35,4 +35,4 @@ use 'nu_scripts/modules/background_task/task.nu'
 #source ~/.zoxide.nu
 
 # nu_scripts
-source `sourced/misc/base64_encode.nu`
+source `./nu_scripts/sourced/misc/base64_encode.nu`
