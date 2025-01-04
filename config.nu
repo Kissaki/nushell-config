@@ -9,7 +9,7 @@ $env.config.hooks.display_output = 'table'
 #$env.config.shell_integration = true
 #$env.config.highlight_resolved_externals = true
 $env.config.table.footer_inheritance = true # render footer in parent table if child is big enough (extended table option)
-$env.config.footer_mode = 'always' # always, never, number_of_rows, auto
+$env.config.footer_mode = 21 # always, never, number_of_rows, auto
 # Never show expanded table content by default (infeasible especially with long content like $env.PATH)
 $env.config.hooks.display_output = 'table'
 # Use a uniform, ordered yyyy-MM-dd… date time format
