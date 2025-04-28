@@ -14,6 +14,7 @@ def is-old [filepath: path] {
 }
 def call-if-old [filepath: path, fn: closure] {
 	if (is-old $filepath) {
+		print $'Generating ($filepath)…'
 		do $fn $filepath
 	}
 }
