@@ -49,25 +49,45 @@ alias dl = yt-dlp
 alias dlup = yt-dlp --update
 alias dlm = yt-dlp -f 251
 # Download highest quality Opus audio as/into .opus file
-def "dl opus" [url: string] {
-	yt-dlp --extract-audio --audio-quality 0 --audio-format opus $"($url)"
+def "dl opus" [...params: string, url: string] {
+	dl --extract-audio --audio-quality 0 --audio-format opus $"($url)"
+}
+# Download highest quality Opus audio as/into .opus file with cookies from Firefox
+def "dl opus firefox" [url: string] {
+	dl --extract-audio --audio-quality 0 --audio-format opus --cookies-from-browser firefox $url
+}
+# Download [YouTube] video with SponsorBlock chapters
+def "dl yt" [url: string] {
+	dl --sponsorblock-mark all $"($url)"
+}
+# Download [YouTube] video with SponsorBlock chapters with cookies from Firefox
+def "dl yt firefox" [url: string] {
+	dl --sponsorblock-mark all --cookies-from-browser firefox $"($url)"
+}
+# Download video with cookies from Firefox and save it to a titled filename
+def "dl firefox titled" [title: string, url: string] {
+	dl --cookies-from-browser firefox --output $"($title) %(title)s [%(id)s].%(ext)s" $"($url)"
 }
 
 # ffmpeg
 alias ff = ffmpeg -hide_banner
 alias fp = ffprobe -hide_banner
 #old-alias ffweb = ff -i $1 -map_chapters -1 -map 0:v -map 0:a -c:v libsvtav1 -pix_fmt yuv420p10le -c:a libopus $2
+# 10-bit x265 mkv
 def "ff 10" [filepath: path] {
     let target = ($filepath | path parse | update stem {|x| $"($x.stem)_10-bit-x265"} | update extension "mkv" | path join)
     ff -i $filepath -c:a libopus -c:v libx265 -pix_fmt yuv420p10le $target
 }
+# 10-bit av1 opus webm
 def "ff webm" [filepath: path] {
     let target = ($filepath | path parse | update extension "webm" | path join)
     ff -i $filepath -c:a libopus -c:v libsvtav1 -pix_fmt yuv420p10le $target
 }
+# alias for ff webm
 def "ff web" [filepath: path] {
     ff webm $filepath
 }
+# 8-bit x264 mp4
 def "ff mp4" [filepath: path] {
     let target = ($filepath | path parse | update stem {|x| $"($x.stem)_x264"} | update extension "mp4" | path join)
     ff -i $filepath -c:a aac -c:v libx264 -pix_fmt yuv420p $target
