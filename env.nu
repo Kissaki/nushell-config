@@ -20,7 +20,9 @@ def call-if-old [filepath: path, fn: closure] {
 }
 
 mkdir $nu.cache-dir
-call-if-old $'($nu.cache-dir)/starship-init.nu' {|filepath| starship init nu | save -f $filepath }
+$nu.vendor-autoload-dirs | each { mkdir $in }
+$nu.user-autoload-dirs | each { mkdir $in }
+call-if-old $'($nu.user-autoload-dirs | first)/starship-init.nu' {|filepath| starship init nu | save -f $filepath }
 #call-if-old $'($nu.cache-dir)/pueue-completions.nu' {|filepath| pueue completions nushell | save -f $filepath }
 #call-if-old $'($nu.cache-dir)/starship-completions.nu' {|filepath| starship completions nushell | save -f $filepath }
 
