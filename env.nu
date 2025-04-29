@@ -2,7 +2,7 @@
 # Sourced there through `source `~\.config\nushell\env.nu``
 
 # Windows Installation path fixup https://github.com/nushell/nushell/issues/13065
-$env.NU_PLUGIN_DIRS = ($env.NU_PLUGIN_DIRS | prepend ($nu.current-exe | path parse | get parent))
+$env.NU_PLUGIN_DIRS = ($env.NU_PLUGIN_DIRS | prepend ($nu.current-exe | path dirname))
 
 const cfgpath = '~\.config\nushell'
 const nuscriptspath2 = $'($cfgpath)\nu_scripts\modules'
