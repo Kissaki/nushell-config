@@ -30,6 +30,8 @@ jobs:
           set -e
           # https://github.com/nushell/nushell/issues/14745
           # nu/nu --env-config env.nu --config config.nu -c 'echo $env.NU_VERSION'
+          nu/nu -c 'print "$nu.vendor-autoload-dirs:"; $nu.vendor-autoload-dirs'
+          nu/nu -c 'print "$nu.user-autoload-dirs:"; $nu.user-autoload-dirs'
           echo Testing env.nu
           nu/nu --no-config-file -c 'source env.nu'
           echo Testing config.nu
