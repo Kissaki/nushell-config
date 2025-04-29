@@ -23,7 +23,7 @@ mkdir $nu.cache-dir
 $nu.vendor-autoload-dirs | last | mkdir $in
 $nu.user-autoload-dirs | last | mkdir $in
 call-if-old $'($nu.user-autoload-dirs | last)/starship-init.nu' {|filepath| starship init nu | save -f $filepath }
-call-if-old $'($nu.user-autoload-dirs | first)/starship-completions.nu' {|filepath| starship completions nushell | save -f $filepath }
+call-if-old $'($nu.user-autoload-dirs | last)/starship-completions.nu' {|filepath| starship completions nushell | save -f $filepath }
 #call-if-old $'($nu.cache-dir)/pueue-completions.nu' {|filepath| pueue completions nushell | save -f $filepath }
 
 #zoxide init nushell | save -f ~/.zoxide.nu
