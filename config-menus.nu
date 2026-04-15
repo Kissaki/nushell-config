@@ -55,3 +55,17 @@ $env.config.keybindings = ($env.config.keybindings | append [
             event: { send: menu name: fuzzy_dir_menu }
         }
     ])
+
+
+$env.config.keybindings = (
+    $env.config.keybindings | append {
+        name: fzf_file_picker
+        modifier: control
+        keycode: char_t
+        mode: [emacs, vi_insert, vi_normal]
+        event: {
+            send: ExecuteHostCommand
+            cmd: "commandline edit --insert (fzf | str trim)"
+        }
+    }
+)
