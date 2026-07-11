@@ -46,8 +46,3 @@ source `./nu_scripts/sourced/misc/base64_encode.nu`
 
 $env.config.color_config.bool = {|x| if $x { 'green' } else { 'dark_red' } }
 $env.config.color_config.filesize = {|x| if $x == 0b { 'dark_gray' } else if $x < 1mb { 'cyan_bold' } else { 'blue_bold' } }
-
-if ('repl-command-info' | path exists) {
-  use repl-command-info
-  repl-command-info --apply
-}
