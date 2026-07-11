@@ -19,6 +19,10 @@ $env.config.datetime_format.normal = '%Y-%m-%d %H:%M:%S %z' # equivalent '%F %T 
 $env.config.datetime_format.table = '%Y-%m-%d %H:%M:%S %z' # equivalent '%F %T %z'
 $env.config.completions.algorithm = 'fuzzy'
 
+$env.config.abbreviations = {
+  ll: "ls -l"
+}
+
 source `config-nusc-completions.nu`
 source `config-aliases-commands.nu`
 
