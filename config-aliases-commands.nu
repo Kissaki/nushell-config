@@ -70,12 +70,16 @@ def "dl opus firefox" [url: string] {
 	dl --extract-audio --audio-quality 0 --audio-format opus --cookies-from-browser firefox $url
 }
 # Download [YouTube] video with SponsorBlock chapters
-def "dl yt" [url: string] {
-	dl --sponsorblock-mark all $"($url)"
+def "dl yt" [...args: string] {
+	dl --sponsorblock-mark all -- ...$args
+}
+# Download video with cookies from Firefox - Usage: `dl firefox --download-sections "*1:8-1:12" https://www.youtube.com/watch?v=CvJ582A_G1U
+def "dl firefox" [...args: string] {
+	dl --cookies-from-browser firefox -- ...$args
 }
 # Download [YouTube] video with SponsorBlock chapters with cookies from Firefox
-def "dl yt firefox" [url: string] {
-	dl --sponsorblock-mark all --cookies-from-browser firefox $"($url)"
+def "dl yt firefox" [...args: string] {
+	dl --sponsorblock-mark all --cookies-from-browser firefox -- ...$args
 }
 # Download video with cookies from Firefox and save it to a titled filename
 def "dl firefox titled" [title: string, url: string] {
@@ -92,11 +96,17 @@ def "dl section" [sectionname: string, url: string] {
 alias ff = ffmpeg -hide_banner
 alias fp = ffprobe -hide_banner
 alias ffp = ffprobe -hide_banner
-# 10-bit x265 mkv
+# 10-bit x265 opus mkv
 def "ff 10" [filepath: path] {
     let target = ($filepath | path parse | update stem {|x| $"($x.stem)_10-bit-x265"} | update extension "mkv" | path join)
     ff -i $filepath -c:a libopus -c:v libx265 -pix_fmt yuv420p10le $target
 }
+# 10-bit av1 opus mkv
+def "ff 10av1" [filepath: path] {
+    let target = ($filepath | path parse | update stem {|x| $"($x.stem)_10-bit-av1"} | update extension "mkv" | path join)
+    ff -i $filepath -c:a libopus -c:v libsvtav1 -pix_fmt yuv420p10le $target
+}
+
 # 10-bit av1 opus webm
 def "ff webm" [filepath: path] {
     let target = ($filepath | path parse | update extension "webm" | path join)
