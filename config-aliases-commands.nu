@@ -44,6 +44,14 @@ alias vim = `C:\Program Files\Vim\vim90\vim.exe`
 #alias code = $'($env.USERPROFILE)\AppData\Local\Programs\Microsoft VS Code\Code.exe'
 #def code [...args] { ^$'($env.USERPROFILE)\AppData\Local\Programs\Microsoft VS Code\Code.exe` ($args | str join " ") }
 
+# dotnet
+# List Directory.Packages.props version declarations that are in no csproj
+def "dotnet unused-dirpackprops" [] {
+  let defs = open Directory.Packages.props | from xml | get content | where tag == ItemGroup | get content.attributes.Include | flatten | sort --ignore-case --natural
+  let refs = ls **/*.csproj | get name | each { open | from xml | get content | select content | flatten | flatten | where tag == PackageReference | get attributes.Include } | flatten | uniq | sort --ignore-case --natural
+  $defs | difference $refs
+}
+
 # winget
 alias up = winget upgrade
 def ups [...name: string] {
@@ -180,4 +188,22 @@ let boms_lookup = $boms | sort-by { |it| $it.hex | str length } --reverse
 def "bom" []: binary -> string {
     let hex_signature = ($in | into binary | take 4 | encode hex)
     $boms_lookup | where {|it| $hex_signature | str starts-with $it.hex } | first | default { label: 'None/Unknown' } | get label
+}
+
+def "pwsh-utf8" [cmd] {
+  ^pwsh --command $"[Console]::OutputEncoding = [Text.Encoding]::UTF8; ($cmd)"
+}
+# `str substring` works over bytes instead of graphenes => split chars, range, join chars
+def "substr" [r: range] {
+  split chars | slice $r | str join
+}
+def "ad whoami" [] {
+  pwsh-utf8 "whoami /groups" | lines | skip 5 | each {
+    {
+      GroupName: ($in | substr 0..56 | str trim --right),
+      Type: ($in | substr 57..73),
+      SID: ($in | substr 74..119),
+      Attributes: ($in | substr 120..),
+    }
+  }
 }
