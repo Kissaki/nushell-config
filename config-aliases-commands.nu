@@ -207,3 +207,20 @@ def "ad whoami" [] {
     }
   }
 }
+
+# Get the last $count command history
+def "history last" [count?: int = 7, only?: bool] {
+  if $only != null {
+    open $nu.history-path | get history | where ($it.exit_status == 0) == $only | last $count
+  } else {
+    open $nu.history-path | get history | last $count
+  }
+  #open $nu.history-path | query db 'select * from history where exit_status != 0'
+}
+def "history count" [] {
+  open $nu.history-path | query db 'select count(*) from history'
+}
+# Remove failed commands from command history (exit code != 0) - requires $nu.history_path to be sqlite (modern command history store)
+def "history cleanup" [] {
+  open $nu.history-path | query db 'delete from history where exit_status != 0'
+}
