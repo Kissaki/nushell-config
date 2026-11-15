@@ -1,6 +1,4 @@
 alias te = table -e
-# Prevent Windows from opening Wordpad when accidentally writing `write` instead of `save`
-alias write = print 'Did you mean to write `save`?'
 
 alias ll = ls -al
 # latest GitHub release - repo form: account/repo
@@ -70,7 +68,7 @@ alias dl = yt-dlp
 alias dlup = yt-dlp --update
 alias dlm = yt-dlp -f 251
 # Download highest quality Opus audio as/into .opus file
-def "dl opus" [...params: string, url: string] {
+def "dl opus" [url: string, ...params: string] {
 	dl --extract-audio --audio-quality 0 --audio-format opus $"($url)"
 }
 # Download highest quality Opus audio as/into .opus file with cookies from Firefox
@@ -190,24 +188,6 @@ def "bom" []: binary -> string {
     $boms_lookup | where {|it| $hex_signature | str starts-with $it.hex } | first | default { label: 'None/Unknown' } | get label
 }
 
-def "pwsh-utf8" [cmd] {
-  ^pwsh --command $"[Console]::OutputEncoding = [Text.Encoding]::UTF8; ($cmd)"
-}
-# `str substring` works over bytes instead of graphenes => split chars, range, join chars
-def "substr" [r: range] {
-  split chars | slice $r | str join
-}
-def "ad whoami" [] {
-  pwsh-utf8 "whoami /groups" | lines | skip 5 | each {
-    {
-      GroupName: ($in | substr 0..56 | str trim --right),
-      Type: ($in | substr 57..73),
-      SID: ($in | substr 74..119),
-      Attributes: ($in | substr 120..),
-    }
-  }
-}
-
 # Get the last $count command history
 def "history last" [count?: int = 7, only?: bool] {
   if $only != null {
@@ -224,3 +204,131 @@ def "history count" [] {
 def "history cleanup" [] {
   open $nu.history-path | query db 'delete from history where exit_status != 0'
 }
+
+def "tablestat" [] {
+  let $table = $in
+  $table | columns | each {|col| { column: $col, count: ($table | get $col | where { |v| not ($v | is-empty) } | length) } }
+}
+
+# Graphene-based `str substring`
+# `str substring` goes over bytes instead of graphenes => split chars, range, join chars
+def "substr" [r: range] {
+  split chars | slice $r | str join
+}
+
+# \ pwsh wraps \
+# Wraps pwsh, separating stdout and stderr into a complete result
+# PowerShell has its own warning stream for output, in addition to stdout and stderr. A simple `3>&2` is not supported. So we combine the pwsh object streams and then, for pwsh call output, stream the warning records into stderr instead of stdout.
+# Returns a `complete` record
+# Example: pws ls | 
+def --wrapped pws [
+  --noprofile
+  ...args: string
+] {
+  let command = ($args | str join " ")
+  
+  let wrapper = "
+    [Console]::OutputEncoding = [Text.Encoding]::UTF8
+    $ErrorActionPreference = 'Continue'
+    & { " + $"($command)" + " } 3>&1 | ForEach-Object {
+      if ($_ -is [System.Management.Automation.WarningRecord]) {
+        [Console]::Error.WriteLine($_.Message)
+      } else {
+        $_
+      }
+    }
+    exit $LASTEXITCODE
+  "
+    
+  let pwsh_args = ["-Command", $wrapper]
+  let pwsh_args = if $noprofile { $pwsh_args | prepend "-NoProfile" } else { $pwsh_args }
+
+  # complete to return structured data with stdout and stderr
+  ^pwsh ...$pwsh_args | complete
+}
+
+# Execute pwsh with result objects expected, converted and interpreted as json
+# Returns: {data,stderr,exit_code}
+# Example: pwso `Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Windows Defender/Operational'; Id=1123} -MaxEvents 3` | get data.Message
+def --wrapped pwso [...args: string] {
+  let command = ($args | str join " ") + " | ConvertTo-Json -Compress"
+  pws $command | insert data { $in.stdout | from json } | reject stdout
+}
+
+# Lists MS Defender operational events
+def "win blocked" [
+  --parse-datetime # Parse 'Detection time' into datetime
+] {
+  # Alternative Filter: `Id=@(1123, 1127)`; 1123: controlled folder access folder access denied, 1127 controlled folder/memory access memory access denied
+  let data = pwso `Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Windows Defender/Operational'; Level=@(1, 2, 3)} -MaxEvents 3 | Select-Object TimeCreated, Id, Message` | get data.Message | each { lines | where $it =~ '(Detection time|Process Name|Path)' | str trim | each { parse '{Key}: {Value}' } | flatten | transpose --header-row } | flatten
+  if $parse_datetime { $data | update 'Detection time' {|x| $x | get 'Detection time' | into datetime } } else { $data }
+}
+
+# Allow application to modify files (in controlled folder access context)
+# Example: After verifying last item should be allowed: win unblock (win blocked | first | get 'Process Name')
+def "win unblock" [path: path] {
+  pws $'Add-MpPreference -ControlledFolderAccessAllowedApplications "($path)"'
+}
+
+# Execute command through powershell with putput encoding set to UTF8
+# Can work around windows CLI util output -> Nushell -> Windows Terminal yielding wrong encoding/wrong interpreted encoding yielding render artifacts
+def "pwsh-utf8" [cmd] {
+  ^pwsh --command $"[Console]::OutputEncoding = [Text.Encoding]::UTF8; ($cmd)"
+}
+
+# / pwsh wraps /
+
+# \ Windows \
+
+# Prevent Windows from opening Wordpad when accidentally writing `write` instead of `save`
+alias write = print 'Did you mean to write `save`?'
+
+# List start menu uninstall lnk files
+# Example: Remove all 'uninstall' start menu shortcuts: win startuninst | get path | each { rm $in }
+def "win startuninst" [] {
+  glob 'C:/ProgramData/Microsoft/Windows/Start Menu/Programs/**/*Uninstall*.lnk' | wrap path | insert filename { $in.path | path basename } | insert foldername { $in.path | path dirname | path basename }
+}
+
+# List disks with their DevicePath
+def "win disks" [] {
+  # nu code: If std-rfc/str dedent or unindent land, we can indent the multi line string in code and then dedent it when passing it to pwsh
+  # Note: Can not indent it; leads to pwsh errors (not forwarded, just exit code)
+  pwso '
+Add-Type -TypeDefinition @"
+  using System;
+  using System.Runtime.InteropServices;
+  using System.Text;
+
+  public class DosDeviceResolver {
+      [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+      public static extern uint QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, int ucchMax);
+  }
+"@
+
+[System.IO.DriveInfo]::GetDrives() | ForEach-Object {
+  $driveLetter = $_.Name.TrimEnd('\')
+  $sb = New-Object System.Text.StringBuilder 32768
+  $ret = [DosDeviceResolver]::QueryDosDevice($driveLetter, $sb, $sb.Capacity)
+  if ($ret -ne 0) {
+    [PSCustomObject]@{
+      Drive       = $_.Name
+      VolumeLabel = if ($_.IsReady) { $_.VolumeLabel } else { "[Not Ready]" }
+      DevicePath  = $sb.ToString()
+    }
+  }
+}'
+}
+
+def "win ad groups" [] {
+  # is passing through pwsh still a necessary workaround for utf8 output?
+  pwsh-utf8 "^whoami /groups" | lines | skip 5 | each {
+    {
+      GroupName: ($in | substr 0..56 | str trim --right),
+      Type: ($in | substr 57..73),
+      SID: ($in | substr 74..119),
+      Attributes: ($in | substr 120..),
+    }
+  }
+}
+
+# / Windows /
